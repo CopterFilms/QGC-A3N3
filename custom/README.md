@@ -1,3 +1,8 @@
+# QGC A3N3 BRIDGE — Custom GCS
+
+Custom build overlay for the A3N3 BRIDGE telemetry link (DJI N3/A3 -> MAVLink).
+Part of the CopterFilms drone-control project. Overlay lives in `custom/`.
+
 # QGroundControl Ground Control Station
 
 ## Custom Build Example
