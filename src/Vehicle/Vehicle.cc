@@ -1734,6 +1734,14 @@ void Vehicle::_parametersReady(bool parametersReady)
         _setupAutoDisarmSignalling();
     }
 
+#if defined(QGC_A3N3_BRIDGE)
+    if (parametersReady && _a3n3BridgeActive()) {
+        // Bridge mode is only known once the marker parameter arrives; refresh the
+        // flight mode label so the DJI DisplayMode name replaces the PX4 default.
+        emit flightModeChanged(flightMode());
+    }
+#endif
+
     _multirotor_speed_limits_available = _firmwarePlugin->mulirotorSpeedLimitsAvailable(this);
     _fixed_wing_airspeed_limits_available = _firmwarePlugin->fixedWingAirSpeedLimitsAvailable(this);
 
