@@ -671,6 +671,12 @@ void PX4FirmwarePlugin::_handleAutopilotVersion(Vehicle* vehicle, mavlink_messag
 {
     Q_UNUSED(vehicle);
 
+#if defined(QGC_A3N3_BRIDGE)
+    // This build is telemetry-only for the A3N3 MAVLink bridge, which reports a zero
+    // flight_sw_version. The stock "please upgrade your firmware" nag does not apply.
+    return;
+#endif
+
     auto* instanceData = qobject_cast<PX4FirmwarePluginInstanceData*>(vehicle->firmwarePluginInstanceData());
     if (!instanceData->versionNotified) {
         bool notifyUser = false;
