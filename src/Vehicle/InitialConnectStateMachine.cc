@@ -89,6 +89,13 @@ void InitialConnectStateMachine::_createStates()
         QStringLiteral("RequestParameters"),
         this,
         [this]() {
+            if (vehicle()->_a3n3BridgeActive()) {
+                // The A3N3 bridge only exposes the raw DJI DisplayMode and has no
+                // parameter protocol support over the radio link, so never wait for
+                // a parameter download (QGC would time out with a connection error).
+                _lastSkipReason = QStringLiteral("(A3N3 MAVLink bridge)");
+                return true;
+            }
             if (_shouldSkipForFlying()) {
                 // PX4 can try a lightweight hash-check cache load
                 if (vehicle()->px4Firmware()) {

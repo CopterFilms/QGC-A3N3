@@ -1478,16 +1478,13 @@ QString Vehicle::flightMode() const
 #if defined(QGC_A3N3_BRIDGE)
 bool Vehicle::_a3n3BridgeActive() const
 {
-    // Returns true when connected through the A3N3 MAVLink bridge in native mode
-    // (A3N3_BRIDGE parameter = 1). Gate on parametersReady() so we never treat the
-    // vehicle as a bridge before the marker parameter has actually been received.
-    if (!_parameterManager->parametersReady()) {
-        return false;
-    }
-    if (!_parameterManager->parameterExists(ParameterManager::defaultComponentId, "A3N3_BRIDGE")) {
-        return false;
-    }
-    return _parameterManager->getParameter(ParameterManager::defaultComponentId, "A3N3_BRIDGE")->rawValue().toInt() > 0;
+    // True when connected through the A3N3 MAVLink bridge in native mode. The bridge
+    // announces itself as a PX4 autopilot and packs the raw DJI DisplayMode into the
+    // low bytes of HEARTBEAT.custom_mode. A genuine PX4 mode always encodes the main
+    // and sub mode bits in the high half-word (custom_mode >= 0x10000), so a value
+    // with the high 16 bits clear identifies the native bridge immediately, without
+    // waiting for a parameter download (the bridge uplink is not reliable).
+    return _firmwareType == MAV_AUTOPILOT_PX4 && (_custom_mode >> 16) == 0;
 }
 
 QString Vehicle::_a3n3FlightModeName() const
