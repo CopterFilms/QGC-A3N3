@@ -274,6 +274,13 @@ bool InitialConnectStateMachine::_hasPrimaryLink() const
 
 bool InitialConnectStateMachine::_shouldSkipForPlanLoad()
 {
+#if defined(QGC_A3N3_BRIDGE)
+    if (vehicle()->_a3n3BridgeActive()) {
+        // The A3N3 MAVLink bridge has no mission/geofence/rally storage
+        _lastSkipReason = QStringLiteral("(A3N3 MAVLink bridge)");
+        return true;
+    }
+#endif
     if (_shouldSkipForFlying()) {
         _lastSkipReason = QStringLiteral("(vehicle is flying)");
         return true;

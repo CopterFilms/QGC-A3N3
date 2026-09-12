@@ -1467,8 +1467,49 @@ QStringList Vehicle::flightModes()
 
 QString Vehicle::flightMode() const
 {
+#if defined(QGC_A3N3_BRIDGE)
+    if (_a3n3BridgeActive()) {
+        return _a3n3FlightModeName();
+    }
+#endif
     return _firmwarePlugin->flightMode(_base_mode, _custom_mode);
 }
+
+#if defined(QGC_A3N3_BRIDGE)
+bool Vehicle::_a3n3BridgeActive() const
+{
+    // Returns true when connected through the A3N3 MAVLink bridge in native mode
+    // (A3N3_BRIDGE parameter = 1). Gate on parametersReady() so we never treat the
+    // vehicle as a bridge before the marker parameter has actually been received.
+    if (!_parameterManager->parametersReady()) {
+        return false;
+    }
+    if (!_parameterManager->parameterExists(ParameterManager::defaultComponentId, "A3N3_BRIDGE")) {
+        return false;
+    }
+    return _parameterManager->getParameter(ParameterManager::defaultComponentId, "A3N3_BRIDGE")->rawValue().toInt() > 0;
+}
+
+QString Vehicle::_a3n3FlightModeName() const
+{
+    // The bridge exposes the raw DJI DisplayMode in HEARTBEAT.custom_mode (byte low),
+    // so no PX4 MAV_MODE->sub/MAIN decoding applies here.
+    switch (_custom_mode) {
+    case 0:  return tr("MANUAL");
+    case 1:  return tr("ATTI");
+    case 6:  return tr("P-GPS");
+    case 10: return tr("TAKE OFF");
+    case 11: return tr("AUTO TKOFF");
+    case 12: return tr("AUTO LAND");
+    case 15: return tr("GO HOME");
+    case 17: return tr("SDK");
+    case 33: return tr("FORCE LAND");
+    case 40: return tr("SEARCH");
+    case 41: return tr("MOTORS ON");
+    default: return tr("Mode %1").arg(_custom_mode);
+    }
+}
+#endif
 
 bool Vehicle::setFlightModeCustom(const QString& flightMode, uint8_t* base_mode, uint32_t* custom_mode)
 {
@@ -1597,18 +1638,33 @@ void Vehicle::sendMessageMultiple(mavlink_message_t message)
 void Vehicle::_missionManagerError(int errorCode, const QString& errorMsg)
 {
     Q_UNUSED(errorCode);
+#if defined(QGC_A3N3_BRIDGE)
+    if (_a3n3BridgeActive()) {
+        return;
+    }
+#endif
     QGC::showAppMessage(tr("Mission transfer failed. Error: %1").arg(errorMsg));
 }
 
 void Vehicle::_geoFenceManagerError(int errorCode, const QString& errorMsg)
 {
     Q_UNUSED(errorCode);
+#if defined(QGC_A3N3_BRIDGE)
+    if (_a3n3BridgeActive()) {
+        return;
+    }
+#endif
     QGC::showAppMessage(tr("GeoFence transfer failed. Error: %1").arg(errorMsg));
 }
 
 void Vehicle::_rallyPointManagerError(int errorCode, const QString& errorMsg)
 {
     Q_UNUSED(errorCode);
+#if defined(QGC_A3N3_BRIDGE)
+    if (_a3n3BridgeActive()) {
+        return;
+    }
+#endif
     QGC::showAppMessage(tr("Rally Point transfer failed. Error: %1").arg(errorMsg));
 }
 

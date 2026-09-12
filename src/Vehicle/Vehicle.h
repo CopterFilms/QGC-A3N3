@@ -868,6 +868,10 @@ private:
     void _handleHomePosition            (mavlink_message_t& message);
     void _handleHeartbeat               (mavlink_message_t& message);
     void _handleCurrentMode             (mavlink_message_t& message);
+#if defined(QGC_A3N3_BRIDGE)
+    bool _a3n3BridgeActive              () const;
+    QString _a3n3FlightModeName         () const;
+#endif
     void _handleRCChannels              (mavlink_message_t& message);
     void _handleBatteryStatus           (mavlink_message_t& message);
     void _handleSysStatus               (mavlink_message_t& message);
