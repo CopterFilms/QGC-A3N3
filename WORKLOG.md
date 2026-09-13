@@ -17,14 +17,14 @@ Built with `QGC_A3N3_BRIDGE` defined (`custom/CMakeLists.txt` →
 ## 2026-09-12 — Incidents & dispositions
 
 ### OSD freezes on ARM / almost blank — ROOT CAUSE IS IN THE BRIDGE, not in the app
-- User reflashed bridge with `MAVLINK_RATE_HZ = 50` (bridge commit `9f7a60b`)
-  and the VTX OSD froze on ARM. Diagnosis: synchronous per-byte serial write at
-  115200 exceeded the 20 ms tick, starved the OSD DisplayPort feed, Ascent VTX
-  dropped the session. **Bridge fix: default back to 20 Hz** (final state =
-  M1-proven TX path). An extra attempt (non-blocking TX ring+drain + forced
-  resync on arm edge, bridge commit `0395270`) left the OSD almost blank and was
-  also reverted. See bridge `WORKLOG.md`; its "OSD almost blank" entry has the
-  field caveat (power-cycle the VTX before blaming a build).
+- Freeze on ARM reproduced with bridge rate 20 (M1 code) → the MAVLink rate was
+  NOT the cause. Real cause (bridge): `g_force_frames = 1` on the arm edge
+  re-sent the ENTIRE canvas in one 250 ms tick (~1.3 KB burst) at the moment the
+  ARM bit switches VTX power → Ascent drops the DisplayPort session → frozen
+  OSD. **Bridge fix: removed the ARM-edge full-canvas burst** (batched periodic
+  repaint covers the cosmetic cleared cell). See bridge `WORKLOG.md`.
+- Earlier tries and dispositions: `9f7a60b` (50 Hz) reverted; `0395270`
+  (non-blocking TX + forced resync) caused a near-blank OSD and was reverted.
 - The app reads raw facts (`CustomAttitudeWidget` → `vehicle.roll.rawValue`);
   there is **no** app-side smoothing or buffering, so latency/freezes observed
   in the app are chain-composed, not app bugs.
