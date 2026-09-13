@@ -10,6 +10,7 @@ Instructions for AI coding agents (Codex, Claude Code, etc.) working on QGroundC
 - [test/README.md](test/README.md) — Test framework, base classes, CTest labels, MultiSignalSpy, coverage
 - [.github/ci-overview.md](.github/ci-overview.md) — CI workflow/action/script layout and conventions
 - [.pre-commit-config.yaml](.pre-commit-config.yaml) — All enforced linters (clang-format, clang-tidy, ruff, pyright, shellcheck, actionlint, zizmor, qmllint, clazy, vehicle-null-check, check-no-qassert, check-no-qtest-ignore-message)
+- [WORKLOG.md](WORKLOG.md) — CopterFilms custom-A3N3-N3 change log / incident registry (A3N3 bridge side: see that repo's WORKLOG)
 
 ## Required Preflight
 
