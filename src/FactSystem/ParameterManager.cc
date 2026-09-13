@@ -1364,7 +1364,9 @@ void ParameterManager::_checkInitialLoadComplete()
                                     "If you are using modified firmware, you may need to resolve any vehicle startup errors to resolve the issue. "
                                     "If you are using standard firmware, you may need to upgrade to a newer version to resolve the issue.").arg(QCoreApplication::applicationName()).arg(_vehicle->id());
         qCDebug(ParameterManagerLog) << errorMsg;
+#if !defined(QGC_A3N3_BRIDGE)
         QGC::showAppMessage(errorMsg);
+#endif
         if (!QGC::runningUnitTests()) {
             qCWarning(ParameterManagerLog) << _logVehiclePrefix(-1) << "The following parameter indices could not be loaded after the maximum number of retries:" << indexList;
         }

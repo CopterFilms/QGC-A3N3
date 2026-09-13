@@ -367,6 +367,14 @@ void QGCApplication::_initForNormalAppBoot()
 
 void QGCApplication::reportMissingParameter(int componentId, const QString& name)
 {
+#if defined(QGC_A3N3_BRIDGE)
+    // Telemetry-only A3N3 bridge: parameters are never downloaded, so the
+    // stock "Parameters are missing from firmware" report is just noise.
+    Q_UNUSED(componentId);
+    Q_UNUSED(name);
+    return;
+#endif
+
     const QPair<int, QString> missingParam(componentId, name);
 
     if (!_missingParams.contains(missingParam)) {
